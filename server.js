@@ -26,7 +26,7 @@ const db = knex({
   app.use((req, res, next) => {
     res.setHeader(
       "Access-Control-Allow-Origin",
-      "https://https://blurit.onrender.com"
+      "https://blurit.onrender.com"
     );
     res.setHeader(
       "Access-Control-Allow-Methods",
