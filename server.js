@@ -27,7 +27,7 @@ const db = knex({
 app.use(express.json());
 app.use(cors());
 
-app.get('/', (req, res) => {
+app.get('/signin', (req, res) => {
     res.send("successful porting");
 })
 
@@ -41,6 +41,4 @@ app.put('/image', (req, res) => { image.handleImage(req, res, db)});
 
 app.post('/imageurl', (req, res) => { image.handleApiCall(req, res)});
 
-app.listen(3000, () => {
-    console.log('app running on 3000')
-})
+app.listen(DB_PORT);
