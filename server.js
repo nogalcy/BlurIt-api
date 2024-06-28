@@ -1,9 +1,9 @@
 require('dotenv').config();
 const express = require('express');
 const bcrypt = require('bcrypt-nodejs');
-//const cors = require('cors');
+const cors = require('cors');
 const app = express();
-const knex = require('knex')
+const knex = require('knex');
 
 const register = require('./controllers/register');
 const signin = require('./controllers/signin');
@@ -21,59 +21,48 @@ const db = knex({
     password: process.env.DB_PASSWORD,
     database: process.env.DB_NAME,
   },
-  });
-
-  app.use((req, res, next) => {
-    res.setHeader(
-      "Access-Control-Allow-Origin",
-      "https://blurit.onrender.com"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Methods",
-      "GET,HEAD,PUT,PATCH,POST,DELETE,OPTIONS,CONNECT,TRACE"
-    );
-    res.setHeader(
-      "Access-Control-Allow-Headers",
-      "Content-Type, Authorization, X-Content-Type-Options, Accept, X-Requested-With, Origin, Access-Control-Request-Method, Access-Control-Request-Headers"
-    );
-    res.setHeader("Access-Control-Allow-Credentials", true);
-    res.setHeader("Access-Control-Allow-Private-Network", true);
-    //  Firefox caps this at 24 hours (86400 seconds). Chromium (starting in v76) caps at 2 hours (7200 seconds). The default value is 5 seconds.
-    res.setHeader("Access-Control-Max-Age", 7200);
-  
-    next();
-  });
-
-  // Set preflight
-app.options("*", (req, res) => {
-  console.log("preflight");
-  if (
-    req.headers.origin === "https://blurit.onrender.com" &&
-    allowMethods.includes(req.headers["access-control-request-method"]) &&
-    allowHeaders.includes(req.headers["access-control-request-headers"])
-  ) {
-    console.log("pass");
-    return res.status(204).send();
-  } else {
-    console.log("fail");
-  }
 });
 
-app.use(express.json());
-// app.use(cors(corsOptions));
+// CORS configuration options
+const corsOptions = {
+  origin: 'https://blurit.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
+  credentials: true, // Allow cookies to be sent with requests
+  maxAge: 7200, // Cache preflight response for 2 hours
+};
 
+// Use the CORS middleware with specified options
+app.use(cors(corsOptions));
+
+app.use(express.json());
+
+// Handle preflight requests manually (in addition to using cors middleware)
+app.options('*', (req, res) => {
+  res.setHeader('Access-Control-Allow-Origin', 'https://blurit.onrender.com');
+  res.setHeader('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Origin, Accept');
+  res.setHeader('Access-Control-Allow-Credentials', true);
+  res.setHeader('Access-Control-Max-Age', 7200);
+  res.status(204).send(); // No Content
+});
+
+// Define your routes
 app.get('/signin', (req, res) => {
-    res.send("successful porting");
-})
+  res.send("successful porting");
+});
 
 app.post('/signin', (req, res) => { signin.handleSignIn(req, res, db, bcrypt) });
 
-app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) })
+app.post('/register', (req, res) => { register.handleRegister(req, res, db, bcrypt) });
 
-app.get('/profile/:id', (req, res) => { profile.handleProfile(req, res, db)});
+app.get('/profile/:id', (req, res) => { profile.handleProfile(req, res, db) });
 
-app.put('/image', (req, res) => { image.handleImage(req, res, db)});
+app.put('/image', (req, res) => { image.handleImage(req, res, db) });
 
-app.post('/imageurl', (req, res) => { image.handleApiCall(req, res)});
+app.post('/imageurl', (req, res) => { image.handleApiCall(req, res) });
 
-app.listen(process.env.DB_PORT);
+// Start the server
+app.listen(process.env.DB_PORT, () => {
+  console.log(`Server is running on port ${process.env.DB_PORT}`);
+});
