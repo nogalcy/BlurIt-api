@@ -3,7 +3,6 @@ const express = require('express');
 const bcrypt = require('bcrypt-nodejs');
 const cors = require('cors');
 const app = express();
-app.use(cors());
 const knex = require('knex');
 
 const register = require('./controllers/register');
@@ -24,17 +23,15 @@ const db = knex({
   },
 });
 
-// // CORS configuration options
-// const corsOptions = {
-//   origin: 'https://blurit.onrender.com',
-//   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
-//   credentials: true, // Allow cookies to be sent with requests
-//   maxAge: 7200, // Cache preflight response for 2 hours
-// };
+const corsOptions = {
+  origin: 'https://blurit.onrender.com',
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'Origin', 'Accept'],
+  credentials: true, // Allow cookies to be sent with requests
+  maxAge: 7200, // Cache preflight response for 2 hours
+};
 
-// // Use the CORS middleware with specified options
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 app.use(express.json());
 
